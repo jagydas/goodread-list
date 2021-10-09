@@ -1,123 +1,169 @@
-/*
+const Books_URL  = "https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json?";
+const Revie_URL  = "https://api.nytimes.com/svc/books/v3/reviews.json?";
+const API_Key    = "VHnbdoQ6dvoaOWLbqA2HIgEC0Oif5qns";
+const search     = document.getElementById("search");
+const fav        = document.getElementById("fav");
+var favList      = JSON.parse(localStorage.getItem("favlist")) || [];
+const favItemsEl = document.getElementById("favItems");
+const clear      = document.getElementById("clear-history");
 
-get list of top 15 book and create dynamic tiles or cards with book name , image ,author
 
-when a user clicks the reviews button it should fetch review for that particular book by making another api call.
-
-user will also be provided with "my  read list" button ,on click on the button the book will be added to it's list(new div element may be).
-*/
+const main   = $("#main");  //main Div to be used to append child elements
 
 
-/* store the response from 1st api call in an array 
-   booklist[]
 
-  if user click book[1] then  take that as query string and search review api and display on the page
+async function getBooks(url) {
+    const res = await fetch(url)
+    const data = await res.json()
+
+    showBooks(data.results)
+}
+
+
+
+function fetchBooks() {
+    console.log("ShowBooks") 
+    getBooks(Books_URL + "api-key=" + API_Key);
+    return false;
+}
+
+function showBooks(books) {
+
+    main.innerHTML = '';
+    console.log(books.books);
+    console.log(books.books[0].author);
+
+    books.books.forEach((book) => {
+        const { rank, title, author, book_image, primary_isbn13, description } = book;
+        const bookEl = document.createElement('div')
+        bookEl.classList.add('book') 
+        bookEl.innerHTML = `
+            <img src="${book_image}" alt="${title}" ondblclick="saveFav('${title}')">
+            <div class="book-info">
+                <p id="title"><strong>Title:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${title}</p>
+                <p id="auther"><strong>Author:</strong>&nbsp;${author}</p>
+                <p id="isbn"><strong>Isbn:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${primary_isbn13}</p>
+            </div>
+            <div class="overview">
+                <h4>Overview</h4>
+                <button class="btnreview" onclick="getReviews('${author}')">See Reviews</button> 
+                <p>
+                ${description} </p>
+            </div> `
+        main.append(bookEl);
+
+      })
+      showFav();    
+}
+
+function showFav() {
+    favItemsEl.innerHTML = "";
+    for (let i=0; i<favList.length; i++) {
+        var liTag = document.createElement("li");
+        liTag.textContent = favList[i];
+        var olEl = document.getElementById("favItems");
+        olEl.appendChild(liTag);    
+    }
+}
+
+
+function showFav1() {
+    favItemsEl.innerHTML = "";
+    for (let i=0; i<favList.length; i++) {
+
+     favItemsEl.append(`<p>` + favList[i] + `</p>`);
+    
+    }
+}
+
+
+function saveFav(e){
+    favList.push(e);
+    localStorage.setItem("favlist",JSON.stringify(favList));
+    showFav();
+}
+
+async function getReviews(author) {
+    const res = await fetch(Revie_URL + "author=" + author + "&api-key=" + API_Key);
+    const data = await res.json();
+    
+    showReviews(data.results);
+}
+
+function showReviews(review){
+console.log(review);
+const elm  = document.getElementById("rev");
+const elmH = document.getElementById("heading");
+    elmH.innerHTML = "";
+    elm.innerHTML  = "";
+
+if (review.length > 0) {
+ 
+    console.log(review[0].url);
+    var newH = document.createElement('h3'); 
+        newH.innerHTML = "Review on " + review[0].book_author + " Publications";
+        elmH.appendChild(newH);
+
+    for (i=0; i<review.length; i++) {
+        var count = i + 1;
+        var newA = document.createElement('a');
+        newA.setAttribute('href',review[0].url);
+        newA.setAttribute('target',"_blank");
   
+        newA.innerHTML = "Review-" + count + "<br>";
+        elm.appendChild(newA);
 
-  
-  */
+    }
+    modal.style.display = "block";
+}
+
+else{
+    
+    var newH = document.createElement('h3'); 
+    newH.innerHTML = "No Reviews Found" ;
+    elmH.appendChild(newH);
+    modal.style.display = "block";
+
+   
+    
+
+}
 
 
+}
 
 
-var top15Btn = document.querySelector(".top15");
-var tileContainer = document.querySelector(".suggestion-list-box1");
+function clearHistory() {
+    window.localStorage.removeItem("favlist");
+    window.location.reload();
+  } //end clearHighscores 
 
-// var responseTop15 =
-fetch("https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json?api-key=VHnbdoQ6dvoaOWLbqA2HIgEC0Oif5qns").then(function(response) {
-        response.json().then(function(data) {
-            var bookArray = data.results.books;
-            //  console.log(bookArray);
+  clear.onclick = clearHistory;
 
-            for (var i = 0; i < bookArray.length; i++) {
-                //console.log(bookArray[i]);
-                console.log(bookArray[i].book_image);
-                console.log(bookArray[i].author);
-                console.log(bookArray[i].title);
+// Get the modal
+var modal = document.getElementById("myModal");
 
-                // first display books as tiles on page
-                var tile = document.createElement("div");
-                var img = document.createElement("img");
-                var title = document.createElement("h1");
-                var author = document.createElement("h2");
-                // give a class to the tile ,so that we can capture the click event and get the title to pass it to review api
-                tile.classList.add("tile-book");
-                console.log(tile);
-                img.setAttribute("src", bookArray[i].book_image);
-                title.textContent = bookArray[i].title;
-                author.textContent = bookArray[i].author;
-                tile.appendChild(img);
-                img.setAttribute("class", "coverImg");
-                img.setAttribute("id", bookArray[i].title);
-                tile.appendChild(title);
-                tile.appendChild(author);
-                tileContainer.appendChild(tile);
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
 
-                //  make the 2nd api call in the event listener by passing the title from 1st api
-                var coverImgEL = document.querySelectorAll(".coverImg");
-                for (var j = 0; j < coverImgEL.length; j++) {
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
 
-                    coverImgEL[j].onmouseover = function(event) {
-                        console.log("this is  inside event listener");
-                        // event.stopPropagation();
-                        var queryTitle = event.target.id;
-                        console.log("queryTiltle" + queryTitle);
-                        // if (event.target === ".coverImg") {
-                        //     console.log("this is working");
-                        //     var queryTitle = event.target.id;
-                        fetch("https://api.nytimes.com/svc/books/v3/reviews.json?title=" + queryTitle + "&api-key=VHnbdoQ6dvoaOWLbqA2HIgEC0Oif5qns").then(function(response) {
-                                return response.json()
+// When the user clicks the button, open the modal 
 
-                            }).then(function(review) {
-                                //display first review 
-                                console.log(review);
-                            })
-                            // }
-                    }
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
 
-                }
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
 
 
 
 
-
-
-            }
-        })
-
-    })
-    // give the title from the tile
-
-
-
-
-
-
-
-// On click get the title and make 2nd api call to get summary
-
-// $(document).ready(function() {
-//     $(".tile-book").hover(function() {
-//         console.log("bbbb" + $(this).title);
-//     });
-// });
-
-// On click get the title and make 2nd api call to get summary
-
-// on click of save button ,the time get added to local storage
-
-
-//display the summary
-
-
-
-
-
-
-
-// var formSubmitHandler = function(event) {
-//     event.preventDefault();
-//     console.log(event);
-// };
-
-// top15El.addEventListener("submit", formSubmitHandler);
+search.onclick = fetchBooks;

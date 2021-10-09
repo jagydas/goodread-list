@@ -1,58 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Top 15 Best Sellers</title>
+  </head>
+  <body>
+    <header>
+      <div id="form">
+        <button id="search" class="search">Get Books</button>
+      </div>
+    </header>
+    
+    <div class="favlist">GoodRead List 
+      <button type="button" id="clear-history">Clear</button>
+      <div class="items">
+        <ol id="favItems"></ol>
+    </div>
+    </div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoodRead List</title>
-    <link rel="stylesheet" href="./assets/css/style.css">
-</head>
+    <!-- The Modal -->
+    <div id="myModal" class="modal hide">
 
-
-<body>
-    <main>
-        <!-- This is the header section.This is where our  logo, About Us,What we do -->
-        <header>
-            <div class="container">
-                <div class="main-pic">
-                    <img src="./assets/images/goodreadList.jpg" alt="goodreadList" width="200px" height="200px">
-
-                </div>
-
-            </div>
-            <div class="heading-text">
-                <h1>GoodRead List</h1>
-            </div>
-
-            <div class="top-heading">
-                <ul>
-                    <li>About Us</li>
-                    <li>What we do</li>
-                </ul>
-
-            </div>
-        </header>
-
-        <div class="search-conatiner">
-
-            <div class="book-search-form-box1-h3">
-                <h3>Reading List</h3>
-            </div>
-            <div class="suggestion-list-box1">
-                <button id="top15" type="submit" class="btn">Top 10 Books</button>
-            </div>
-
-        </div>
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span  class="close">&times;</span>
+        <div id="heading"></div>
+        
+      <div id="rev">
+  
+      </div>
+      </div>
+    </div>
 
 
-    </main>
+    <main id="main"></main>
+   
+ 
 
-    <footer>
 
-    </footer>
-    <script src="./assets/js/script.js"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-</body>
+  
 
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
